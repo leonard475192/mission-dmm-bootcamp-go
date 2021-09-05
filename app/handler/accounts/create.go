@@ -31,13 +31,22 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 既存のusernameを弾く、ここでやらないほうがいい気がするが、BadRequestを返すとなると、ここ？
+	// alreadyAccount, err := h.app.Dao.Account().FindByUsername(ctx, req.Username)
+	// if err != nil {
+	// 	httperror.InternalServerError(w, err)
+	// 	return
+	// }
+	// if alreadyAccount != nil {
+	// 	httperror.BadRequest(w, err)
+	// 	return
+	// }
+
 	account, err := h.app.Dao.Account().Create(ctx, *account)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
-
-	// panic("Must Implement Account Registration")
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(account); err != nil {
