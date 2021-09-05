@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   mysql:
+    platform: linux/x86_64
     image: mysql:5.7
     command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --default-time-zone='+9:00'"
     ports:
@@ -16,6 +17,7 @@ services:
     restart: on-failure
 
   web:
+    platform: linux/x86_64
     build:
       context: .
       dockerfile: Dockerfile
@@ -42,6 +44,7 @@ services:
     restart: on-failure
 
   swagger-ui:
+    platform: linux/x86_64
     image: swaggerapi/swagger-ui
     ports:
       - "8081:8080"
