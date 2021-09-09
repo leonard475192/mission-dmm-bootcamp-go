@@ -24,8 +24,8 @@ func NewAccount(db *sqlx.DB) repository.Account {
 }
 
 // Create User :
-func (r *account) Create(ctx context.Context, user object.Account) (*object.Account, error) {
-	query, err := r.db.NamedExecContext(ctx, `INSERT INTO account (username, password_hash) VALUES (:username,:password_hash)`, user)
+func (r *account) Create(ctx context.Context, account object.Account) (*object.Account, error) {
+	query, err := r.db.NamedExecContext(ctx, `INSERT INTO account (username, password_hash) VALUES (:username,:password_hash)`, account)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
@@ -35,7 +35,7 @@ func (r *account) Create(ctx context.Context, user object.Account) (*object.Acco
 	}
 
 	entity := new(object.Account)
-	err = r.db.QueryRowxContext(ctx, "select * from account where id = ?", id).StructScan(entity)
+	err = r.db.QueryRowxContext(ctx, "SELECT * FROM account WHERE id = ?", id).StructScan(entity)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
