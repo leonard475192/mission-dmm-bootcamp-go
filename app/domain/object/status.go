@@ -4,7 +4,7 @@ type (
 	StatusID = int64
 
 	Status struct {
-		ID               StatusID `json:"-"`
+		ID               StatusID `json:"id"`
 		AccountID        int64    `json:"account_id,omitempty"  db:"account_id"`
 		Account          Account  `json:"account,omitempty"`
 		Content          string   `json:"content,omitempty"`

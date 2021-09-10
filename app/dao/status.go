@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 	"fmt"
-	"log"
 	"yatter-backend-go/app/domain/object"
 	"yatter-backend-go/app/domain/repository"
 
@@ -33,25 +32,31 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 		return nil, fmt.Errorf("LastInsertId:%w", err)
 	}
 
+	// StructScan でリレーションやりたかった
 	// TODO QueryRowxContext:missing destination name username in *object.Status
+	// entity := new(object.Status)
+	// log.Print(entity)
+	// err = r.db.QueryRowxContext(ctx, comfirm, id).StructScan(entity)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("QueryRowxContext:%w", err)
+	// }
+	var statuses []object.Status
 	const comfirm = `
-		SELECT *
+		SELECT
+			status.id AS id,
+			status.content AS content,
+			status.create_at AS create_at,
+			account.id AS "account.id",
+			account.username AS "account.username",
+			account.create_at AS "account.create_at"
 		FROM status
 		JOIN account ON status.account_id = account.id
 		WHERE status.id = ?
 	`
-
-	entity := new(object.Status)
-	log.Print(entity)
-	err = r.db.QueryRowxContext(ctx, comfirm, id).StructScan(entity)
+	err = r.db.SelectContext(ctx, &statuses, comfirm, id)
 	if err != nil {
-		return nil, fmt.Errorf("QueryRowxContext:%w", err)
+		return nil, fmt.Errorf("SelectContext:%w", err)
 	}
-	// var statuses []object.Status
-	// err = r.db.SelectContext(ctx, &statuses, "SELECT * FROM status JOIN account ON status.account_id = account.id WHERE status.id = ?", id)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("SelectContext:%w", err)
-	// }
 
-	return entity, nil
+	return &statuses[0], nil
 }
