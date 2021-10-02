@@ -3,6 +3,7 @@ package statuses
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"yatter-backend-go/app/handler/httperror"
 
 	"github.com/go-chi/chi"
@@ -10,10 +11,15 @@ import (
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	id := chi.URLParam(r, "id")
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	status, err := h.app.Dao.Status().Get(ctx, id)
 	if err != nil {
 		httperror.InternalServerError(w, err)
+		return
+	}
+	// TODO response body
+	if status == nil {
+		http.NotFound(w, r)
 		return
 	}
 

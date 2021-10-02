@@ -31,38 +31,18 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 	if err != nil {
 		return nil, fmt.Errorf("LastInsertId:%w", err)
 	}
-
-	// StructScan でリレーションやりたかった
-	// TODO QueryRowxContext:missing destination name username in *object.Status
-	// entity := new(object.Status)
-	// log.Print(entity)
-	// err = r.db.QueryRowxContext(ctx, comfirm, id).StructScan(entity)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("QueryRowxContext:%w", err)
-	// }
-	// FIXME Get呼び出したいかも
-	var statuses []object.Status
-	const comfirm = `
-		SELECT
-			status.id AS id,
-			status.content AS content,
-			status.create_at AS create_at,
-			account.id AS "account.id",
-			account.username AS "account.username",
-			account.create_at AS "account.create_at"
-		FROM status
-		JOIN account ON status.account_id = account.id
-		WHERE status.id = ?
-	`
-	err = r.db.SelectContext(ctx, &statuses, comfirm, id)
-	if err != nil {
-		return nil, fmt.Errorf("SelectContext:%w", err)
-	}
-
-	return &statuses[0], nil
+	return r.Get(ctx, int(id))
 }
 
-func (r *status) Get(ctx context.Context, id string) (*object.Status, error) {
+// StructScan でリレーションやりたかった
+// TODO QueryRowxContext:missing destination name username in *object.Status
+// entity := new(object.Status)
+// log.Print(entity)
+// err = r.db.QueryRowxContext(ctx, comfirm, id).StructScan(entity)
+// if err != nil {
+// 	return nil, fmt.Errorf("QueryRowxContext:%w", err)
+// }
+func (r *status) Get(ctx context.Context, id int) (*object.Status, error) {
 	var statuses []object.Status
 	const comfirm = `
 		SELECT
@@ -76,10 +56,14 @@ func (r *status) Get(ctx context.Context, id string) (*object.Status, error) {
 		JOIN account ON status.account_id = account.id
 		WHERE status.id = ?
 	`
+	// TODO r.db.SelectContext(ctx, &status, comfirm, id) でも良いが、上手なエラーハンドリングができなかった
+	// TODO fmt.Errorf => errors.Wrap
 	err := r.db.SelectContext(ctx, &statuses, comfirm, id)
 	if err != nil {
 		return nil, fmt.Errorf("SelectContext:%w", err)
 	}
-
+	if len(statuses) == 0 {
+		return nil, nil
+	}
 	return &statuses[0], nil
 }
