@@ -61,7 +61,7 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 	return &statuses[0], nil
 }
 
-func (r *account) Get(ctx context.Context, id string) (*object.Status, error) {
+func (r *status) Get(ctx context.Context, id string) (*object.Status, error) {
 	var statuses []object.Status
 	const comfirm = `
 		SELECT

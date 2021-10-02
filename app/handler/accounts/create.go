@@ -2,6 +2,8 @@ package accounts
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
 	"yatter-backend-go/app/domain/object"
@@ -32,17 +34,18 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 既存のusernameを弾く、ここでやらないほうがいい気がするが、BadRequestを返すとなると、ここ？
-	// alreadyAccount, err := h.app.Dao.Account().FindByUsername(ctx, req.Username)
-	// if err != nil {
-	// 	httperror.InternalServerError(w, err)
-	// 	return
-	// }
-	// if alreadyAccount != nil {
-	// 	httperror.BadRequest(w, err)
-	// 	return
-	// }
+	alreadyAccount, err := h.app.Dao.Account().FindByUsername(ctx, req.Username)
+	log.Printf("already account: %v", alreadyAccount)
+	if err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+	if alreadyAccount != nil {
+		httperror.BadRequest(w, fmt.Errorf("%v", "Validation Error: This name exists."))
+		return
+	}
 
-	account, err := h.app.Dao.Account().Create(ctx, *account)
+	account, err = h.app.Dao.Account().Create(ctx, *account)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
