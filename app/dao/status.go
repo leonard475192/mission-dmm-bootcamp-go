@@ -60,3 +60,25 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 
 	return &statuses[0], nil
 }
+
+func (r *account) Get(ctx context.Context, id string) (*object.Status, error) {
+	var statuses []object.Status
+	const comfirm = `
+		SELECT
+			status.id AS id,
+			status.content AS content,
+			status.create_at AS create_at,
+			account.id AS "account.id",
+			account.username AS "account.username",
+			account.create_at AS "account.create_at"
+		FROM status
+		JOIN account ON status.account_id = account.id
+		WHERE status.id = ?
+	`
+	err := r.db.SelectContext(ctx, &statuses, comfirm, id)
+	if err != nil {
+		return nil, fmt.Errorf("SelectContext:%w", err)
+	}
+
+	return &statuses[0], nil
+}
