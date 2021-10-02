@@ -40,6 +40,7 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 	// if err != nil {
 	// 	return nil, fmt.Errorf("QueryRowxContext:%w", err)
 	// }
+	// FIXME Get呼び出したいかも
 	var statuses []object.Status
 	const comfirm = `
 		SELECT
