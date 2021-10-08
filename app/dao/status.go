@@ -67,3 +67,16 @@ func (r *status) Get(ctx context.Context, id int) (*object.Status, error) {
 	}
 	return &statuses[0], nil
 }
+
+// TODO Getとかして、空でないレスポンスを返せる準備したほうがいいかも
+func (r *status) Delete(ctx context.Context, id int) error {
+	const sql_delete = `
+		DELETE
+		FROM status
+		WHERE status.id = ?
+	`
+	if _, err := r.db.ExecContext(ctx, sql_delete, id); err != nil {
+		return fmt.Errorf("ExecContext:%w", err)
+	}
+	return nil
+}

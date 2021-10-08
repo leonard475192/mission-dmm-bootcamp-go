@@ -11,4 +11,5 @@ type Status interface {
 	// TODO: Add Other APIs
 	Create(ctx context.Context, status object.Status) (*object.Status, error)
 	Get(ctx context.Context, id int) (*object.Status, error)
+	Delete(ctx context.Context, id int) error
 }

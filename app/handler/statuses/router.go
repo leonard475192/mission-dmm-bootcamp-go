@@ -24,6 +24,7 @@ func NewRouter(app *app.App) http.Handler {
 	loginGroup := r.Group(nil)
 	loginGroup.Use(auth.Middleware(app))
 	loginGroup.Post("/", h.Create)
+	loginGroup.Delete("/{id}", h.Delete)
 
 	return r
 }
