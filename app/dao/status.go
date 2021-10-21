@@ -42,6 +42,7 @@ func (r *status) Create(ctx context.Context, status object.Status) (*object.Stat
 // if err != nil {
 // 	return nil, fmt.Errorf("QueryRowxContext:%w", err)
 // }
+// TODO LIMIT 1 でも良いかも
 func (r *status) Get(ctx context.Context, id int) (*object.Status, error) {
 	var statuses []object.Status
 	const comfirm = `
@@ -66,6 +67,28 @@ func (r *status) Get(ctx context.Context, id int) (*object.Status, error) {
 		return nil, nil
 	}
 	return &statuses[0], nil
+}
+
+func (r *status) Select(ctx context.Context, only_media bool, greater_than_id int, less_than_id int, limit int) ([]object.Status, error) {
+	var statuses []object.Status
+	const comfirm = `
+		SELECT
+			status.id AS id,
+			status.content AS content,
+			status.create_at AS create_at,
+			account.id AS "account.id",
+			account.username AS "account.username",
+			account.create_at AS "account.create_at"
+		FROM status
+		JOIN account ON status.account_id = account.id
+		WHERE ? < status.id AND status.id < ?
+		LIMIT ?
+	`
+	err := r.db.SelectContext(ctx, &statuses, comfirm, greater_than_id, less_than_id, limit)
+	if err != nil {
+		return nil, fmt.Errorf("SelectContext:%w", err)
+	}
+	return statuses, nil
 }
 
 // TODO Getとかして、空でないレスポンスを返せる準備したほうがいいかも
